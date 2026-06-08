@@ -1,0 +1,22 @@
+@startuml JPA Use Cases
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Engine Context" as engine
+actor "Database Administrator" as dba
+
+rectangle "crud-engine-jpa" {
+  usecase "Check if Entity has @Entity Annotation" as UC_SupportsJPA
+  usecase "Instantiate Repository via factory" as UC_InstantiateRepository
+  usecase "Apply Dynamic Filter & Sorting Criteria" as UC_Criteria
+  usecase "Apply Entity Graph dynamically based on DTO fields" as UC_EntityGraph
+  usecase "Perform Persistent Database Operations (HikariCP / Postgres)" as UC_DbOps
+}
+
+engine --> UC_SupportsJPA
+engine --> UC_InstantiateRepository
+engine --> UC_Criteria
+engine --> UC_EntityGraph
+engine --> UC_DbOps
+dba --> UC_DbOps
+@enduml

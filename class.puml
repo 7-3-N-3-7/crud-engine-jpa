@@ -1,0 +1,42 @@
+@startuml JPA Class Diagram
+skinparam classAttributeIconSize 0
+
+package com.org73n37.crudapp.logic.spi {
+  interface CrudStorageProvider<T> {
+    + save(T): T
+    + findById(Long): Optional<T>
+    + findAll(): List<T>
+    + deleteById(Long): void
+    + existsById(Long): boolean
+    + count(): long
+  }
+}
+
+package com.org73n37.crudapp.data.core {
+  class CrudRepository<T extends BaseEntity> implements CrudStorageProvider {
+    - EntityManager entityManager
+    - Class<T> entityClass
+    - getActiveTenantId(): String
+    + findAll(): List<T>
+    + findAll(int, int): List<T>
+    + findById(Long): Optional<T>
+    + save(T): T
+    + deleteById(Long): void
+    + existsById(Long): boolean
+    + count(): long
+    + findAll(int, int, Map, String, Class): Page<T>
+    + findAllList(int, int, Map, String, Class): List<T>
+    - convertValue(String, Class): Object
+  }
+}
+
+package com.org73n37.crudapp.data.jpa {
+  class JpaStorageProviderFactory implements CrudStorageProviderFactory {
+    - EntityManager entityManager
+    + supports(Class<?>): boolean
+    + getStorageProvider(Class<T>): CrudStorageProvider<T>
+  }
+}
+
+JpaStorageProviderFactory --> CrudRepository : "creates"
+@enduml

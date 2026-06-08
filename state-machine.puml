@@ -1,0 +1,12 @@
+@startuml JPA Entity Persistence State Machine
+[*] --> Transient : Entity instantiated (id is null)
+
+Transient --> Managed : save() called -> entityManager.persist()
+Managed --> Managed : fields updated & save() called -> entityManager.merge()
+
+Managed --> Detached : Transaction commits / session closed
+Detached --> Managed : save() called -> entityManager.merge()
+
+Managed --> Removed : deleteById() called -> entityManager.remove()
+Removed --> [*] : Transaction commits (physical delete)
+@enduml

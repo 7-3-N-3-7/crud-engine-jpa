@@ -1,0 +1,25 @@
+@startuml JPA Entity Relation Diagram
+skinparam linetype ortho
+
+entity "EntityManager" as EM {
+  --
+  * persist()
+  * merge()
+  * find()
+}
+
+entity "CriteriaBuilder" as CB {
+  --
+  * equal()
+  * like()
+  * greaterThan()
+}
+
+entity "EntityGraph" as EG {
+  --
+  * addAttributeNodes()
+}
+
+EM ||--|| CB : "creates criteria query"
+EM ||--|| EG : "creates dynamic graphs"
+@enduml

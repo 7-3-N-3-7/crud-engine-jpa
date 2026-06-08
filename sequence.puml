@@ -1,0 +1,58 @@
+@startuml JPA Query Execution Sequence
+participant "CrudRepository" as Repo
+participant "CriteriaBuilder" as CB
+participant "CriteriaQuery" as CQ
+participant "EntityManager" as EM
+participant "EntityGraph" as EG
+database "Database" as Db
+
+[-> Repo : findAll(offset, limit, queryParams, sortParam, dtoClass)
+activate Repo
+
+Repo -> EM : getCriteriaBuilder()
+activate EM
+EM --> Repo : CriteriaBuilder
+deactivate EM
+
+Repo -> CB : createQuery(entityClass)
+activate CB
+CB --> Repo : CriteriaQuery
+deactivate CB
+
+Repo -> CQ : from(entityClass)
+activate CQ
+CQ --> Repo : Root
+deactivate CQ
+
+Repo -> Repo : Apply predicates (tenantId, dynamic filters e.g. name_like)
+Repo -> Repo : Apply sorting
+
+alt dtoClass != null
+  Repo -> EM : createEntityGraph(entityClass)
+  activate EM
+  EM --> Repo : EntityGraph
+  deactivate EM
+  Repo -> EG : addAttributeNodes(dtoFields)
+  activate EG
+  EG --> Repo : updatedGraph
+  deactivate EG
+end
+
+Repo -> EM : createQuery(CriteriaQuery)
+activate EM
+EM --> Repo : TypedQuery
+deactivate EM
+
+Repo -> Repo : Set offset, limit, hints (fetchgraph)
+Repo -> EM : getResultList()
+activate EM
+EM -> Db : SELECT ... (with JOINs/fetch plan)
+activate Db
+Db --> EM : ResultSet
+deactivate Db
+EM --> Repo : List<T>
+deactivate EM
+
+[<-- Repo : Page<T> (with Count query)
+deactivate Repo
+@enduml
